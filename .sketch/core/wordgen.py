@@ -1,4 +1,4 @@
-from setupcl import SetupCL
+from .setupcl import SetupCL
 from random import choice, randrange
 from typing import List
 
@@ -38,11 +38,3 @@ class WordGenerator:
         import re
         optional = re.compile(r"\(?\w\)?")
         return re.findall(optional, target)
-
-
-"""
-"hɨ·dziɽ"
-["ˈhɨ", "dziɽ"]
-"ˈhɨ·dziɽ"
-["ˈhɨ", "dziɽ"]
-"""
