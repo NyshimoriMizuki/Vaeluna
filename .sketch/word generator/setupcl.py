@@ -7,6 +7,7 @@ class SetupCL:
         self.syllable_struct = ""
         self.word_length = 0
         self.phonemes: Dict[str, List[str]] = dict()
+        self.others = dict()
         self.read_json(
             scl_file if "test.scl.json" in scl_file else scl_file+".scl.json")
 
