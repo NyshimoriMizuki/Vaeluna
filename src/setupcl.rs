@@ -6,9 +6,10 @@ pub mod setupcl {
 
     #[derive(Deserialize, Serialize, Debug)]
     pub struct SetupCL {
-        pub syllable_struct: String,
-        pub word_length: u32,
-        pub phonemes: HashMap<String, Vec<String>>,
+        syllable_struct: String,
+        word_length: u32,
+        phonemes: HashMap<String, Vec<String>>,
+        pub extra_params: Option<HashMap<String, bool>>,
     }
 
     impl SetupCL {

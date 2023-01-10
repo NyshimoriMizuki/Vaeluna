@@ -5,5 +5,8 @@
         "C": ["h", "dz"],
         "V": ["ɨ", "i"],
         "F": ["ɽ"]
+    },
+    "extra_params": {
+        "no_stops_encounter": true
     }
 }
