@@ -1,3 +1,6 @@
+//! # WordGenerator
+//!
+
 use rand::seq::SliceRandom;
 use rand::Rng;
 use std::collections::HashMap;
@@ -5,7 +8,6 @@ use std::collections::HashMap;
 mod formatter;
 
 use crate::setupcl::SetupCL;
-use formatter::Formatter;
 
 #[derive(Debug)]
 pub struct WordGenerator<'a> {
@@ -15,6 +17,14 @@ pub struct WordGenerator<'a> {
 }
 
 impl WordGenerator<'_> {
+    /// Constructs a `WordGenerator<'a>` with the parameters setted with
+    /// `SetupCL`
+    ///
+    /// ## Example
+    /// ```
+    /// let setup = SetupCL::from_json("...").expect("...");
+    /// let generator = WordGenerator::new(setup);
+    /// ```
     pub fn new<'a>(setup: &'a SetupCL) -> WordGenerator<'a> {
         WordGenerator {
             phonemes: setup.get_phonemes(),
@@ -22,16 +32,20 @@ impl WordGenerator<'_> {
             syllable_struct: break_into_vec(setup.get_syllable_struct()),
         }
     }
+
+    /// This Function creates a [`Vec<String>`] that contains new words
+    ///
+    /// `num` tells how many words will be generated
     pub fn generate(self, num: Option<u32>) -> Vec<String> {
         let mut words: Vec<String> = Vec::new();
         let mut rng = rand::thread_rng();
 
         for _ in 0..num.unwrap_or(1) {
-            let num_of_syllables = rng.gen_range(0..self.max_word_length) + 1;
-            let stress_position = rng.gen_range(0..num_of_syllables);
+            let number_of_syllables = rng.gen_range(0..self.max_word_length) + 1;
+            let stress_position = rng.gen_range(0..number_of_syllables);
 
             let mut new_word: Vec<String> = Vec::new();
-            for i in 0..num_of_syllables {
+            for i in 0..number_of_syllables {
                 new_word.push(self.new_syllable(i == stress_position));
             }
             words.push(new_word.join("·"));
