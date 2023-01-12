@@ -2,7 +2,10 @@ use rand::seq::SliceRandom;
 use rand::Rng;
 use std::collections::HashMap;
 
+mod formatter;
+
 use crate::setupcl::SetupCL;
+use formatter::Formatter;
 
 #[derive(Debug)]
 pub struct WordGenerator<'a> {
@@ -25,15 +28,11 @@ impl WordGenerator<'_> {
 
         for _ in 0..num.unwrap_or(1) {
             let num_of_syllables = rng.gen_range(0..self.max_word_length) + 1;
-            let stress_possition = rng.gen_range(0..num_of_syllables);
+            let stress_position = rng.gen_range(0..num_of_syllables);
 
             let mut new_word: Vec<String> = Vec::new();
             for i in 0..num_of_syllables {
-                if i == stress_possition {
-                    new_word.push(self.new_syllable(true));
-                } else {
-                    new_word.push(self.new_syllable(false));
-                }
+                new_word.push(self.new_syllable(i == stress_position));
             }
             words.push(new_word.join("·"));
         }
@@ -41,29 +40,25 @@ impl WordGenerator<'_> {
         words
     }
 
-    pub fn new_syllable(&self, stress: bool) -> String {
+    fn new_syllable(&self, is_stressed: bool) -> String {
         let mut new_syllable = String::new();
         let mut rand_gen = rand::thread_rng();
 
         for i in &self.syllable_struct {
-            if i.contains("(") && rand_gen.gen::<bool>() {
+            let optional_phoneme = i.contains("(");
+
+            if optional_phoneme && rand_gen.gen::<bool>() {
                 continue;
             }
-            let phonemes = self
-                .phonemes
-                .get(if i.contains("(") { &i[1..2] } else { *i })
-                .expect("no phoneme");
-
             new_syllable.push_str(
-                phonemes
+                self.phonemes
+                    .get(if optional_phoneme { &i[1..2] } else { *i })
+                    .expect("Invalid phoneme group")
                     .choose(&mut rand_gen)
-                    .expect("error on choice some phoneme"),
+                    .expect("Error in choice some phoneme"),
             );
         }
-        if stress {
-            return format!("ˈ{}", new_syllable);
-        }
-        new_syllable
+        return format!("{}{}", if is_stressed { "ˈ" } else { "" }, new_syllable);
     }
 }
 

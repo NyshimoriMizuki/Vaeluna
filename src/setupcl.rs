@@ -21,11 +21,9 @@ impl SetupCL {
     pub fn get_syllable_struct(&self) -> &str {
         &self.syllable_struct[..]
     }
-}
 
-impl SetupCL {
     pub fn from_json(filename: &str) -> Result<SetupCL, Error> {
-        let file = read_to_string(filename).expect("Error on opening file");
+        let file = read_to_string(filename).expect("Error when opening file");
         let new_setup_cl = serde_json::from_str::<SetupCL>(&file);
 
         match new_setup_cl {

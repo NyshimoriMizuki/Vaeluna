@@ -15,11 +15,11 @@ class WordGenerator:
             random_length = randrange(0, self.max_word_length) + 1
             stress_place = randrange(0, random_length)
 
-            new_word = []
-            for i in range(random_length):
+            new_word = [
                 new_word.append(self.__new_syllable(
-                    stress=True if i == stress_place else False))
-
+                    stress=i == stress_place
+                )) for i in range(random_length)
+            ]
             words.append("·".join(new_word))
         return words
 
@@ -28,8 +28,7 @@ class WordGenerator:
         for i in self.syllable_struct:
             if "(" in i and ")" in i and choice((True, False)):
                 continue
-            i = i.replace("(", "")
-            i = i.replace(")", "")
+            i = i.replace("(", "").replace(")", "")
             building_syllable += choice(self.phonemes[i])
         return building_syllable if not stress else "ˈ"+building_syllable
 
