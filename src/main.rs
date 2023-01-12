@@ -1,8 +1,11 @@
 mod setupcl;
+mod wordgen;
 
-use setupcl::setupcl::SetupCL;
+use setupcl::SetupCL;
+use wordgen::WordGenerator;
 
 fn main() {
-    let test = SetupCL::new("samples/test.scl.json").expect("File don't existe");
-    println!("{:#?}", test.extra_params)
+    let setup = SetupCL::from_json("samples/test.scl.json").expect("File don't existe");
+    let test = WordGenerator::new(&setup);
+    println!("{}", test.new_syllable(true));
 }

@@ -6,13 +6,13 @@ from typing import List
 class WordGenerator:
     def __init__(self, setup: SetupCL):
         self.phonemes = setup.phonemes
-        self.word_length = setup.word_length
+        self.max_word_length = setup.word_length
         self.syllable_struct = self.__break_into_list(setup.syllable_struct)
 
     def generate(self, num: int = 1):
         words = []
         for _ in range(num):
-            random_length = randrange(0, self.word_length) + 1
+            random_length = randrange(0, self.max_word_length) + 1
             stress_place = randrange(0, random_length)
 
             new_word = []
