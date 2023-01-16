@@ -1,8 +1,10 @@
 from core import SetupCL, WordGenerator
-from core.formatter import Reader
+from core.formatter import FormatterReader
+from core.phevo import PhevoReader
 
 sample = SetupCL("samples/test")
 gen = WordGenerator(sample)
 
-formater = Reader("samples/test.fmtcl")
-print(list(formater.tokenize()))
+formater = FormatterReader("samples/test.fmtcl")
+phevo = PhevoReader("samples/test_to_pex.phevo")
+print(list(phevo.tokenize()))

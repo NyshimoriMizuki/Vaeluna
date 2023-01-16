@@ -1,0 +1,11 @@
+group C {all consonants}
+group V {all vowels}
+
+{h ʔ} -> 0 / #_
+ɽ -> h
+b d -> p t
+w -> gʷ -> g "comment"
+@"stop comment"
+change_vowels_æ:
+ - e o -> i u /_#
+ - a -> æ / _{k g} or {k g}_
