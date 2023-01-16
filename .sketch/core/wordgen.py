@@ -16,9 +16,9 @@ class WordGenerator:
             stress_place = randrange(0, random_length)
 
             new_word = [
-                new_word.append(self.__new_syllable(
+                self.__new_syllable(
                     stress=i == stress_place
-                )) for i in range(random_length)
+                ) for i in range(random_length)
             ]
             words.append("·".join(new_word))
         return words

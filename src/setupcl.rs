@@ -65,6 +65,7 @@ use serde_json::{self, Error};
 use std::collections::HashMap;
 use std::fs::read_to_string;
 
+/// # SetupCL
 #[derive(Deserialize, Serialize, Debug)]
 pub struct SetupCL {
     syllable_struct: String,
@@ -74,12 +75,35 @@ pub struct SetupCL {
 }
 
 impl SetupCL {
+    /// returns the phonemes from the SetupCL
+    ///
+    /// # Example
+    /// ```
+    /// let setup = Setup::from_json("...").expect("File don't existe");
+    /// let phonemes = setup.get_phonemes();
+    /// ```
     pub fn get_phonemes(&self) -> HashMap<String, Vec<String>> {
         copy(&self.phonemes)
     }
+
+    /// returns the word_length from the SetupCL
+    ///
+    /// # Example
+    /// ```
+    /// let setup = Setup::from_json("...").expect("File don't existe");
+    /// let phonemes = setup.get_word_length();
+    /// ```
     pub fn get_word_length(&self) -> &u32 {
         &self.word_length
     }
+
+    /// returns the syllable_struct from the SetupCL
+    ///
+    /// # Example
+    /// ```
+    /// let setup = Setup::from_json("...").expect("File don't existe");
+    /// let phonemes = setup.get_syllable_struct();
+    /// ```
     pub fn get_syllable_struct(&self) -> &str {
         &self.syllable_struct[..]
     }

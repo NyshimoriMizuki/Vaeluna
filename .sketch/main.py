@@ -1,6 +1,8 @@
 from core import SetupCL, WordGenerator
+from core.formatter import Reader
 
 sample = SetupCL("samples/test")
 gen = WordGenerator(sample)
-print(gen.generate(10))
-input()
+
+formater = Reader("samples/test.fmtcl")
+print(list(formater.tokenize()))

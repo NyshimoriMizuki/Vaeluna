@@ -1,0 +1,19 @@
+group C {all consonants}
+group V {all vowels}
+group F {j w ɽ}
+
+filter ajust_syllable:
+	if /C%V/ do /C%ʔV/ or if /C/=/W/ do /%CV/
+
+filter mergin_back_vowel:
+	if /ɸo/ do /ɸ{i e a}/
+	if /ŋo/ do /ŋ{i e a}/
+
+filter no_ew:
+	if /ew/ do /o/
+	if /we/ or /w%e/ do /wa/
+
+filter no_ji:
+	if /jiF/ or /j%iF/ do /ʔiF/
+	if /ji/ or /j%i/ do /j/
+	if /jj/ or /j%j/ do /%j/

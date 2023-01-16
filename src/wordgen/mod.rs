@@ -54,6 +54,16 @@ impl WordGenerator<'_> {
         words
     }
 
+    /// Build a new syllable, that could be a stressed syllable
+    ///
+    /// # Example
+    /// ```
+    /// impl WordGenerator<'_> {
+    ///     pub fn new_monosyllabic_word(self, stress: bool) -> String {
+    ///         self.new_syllable(stress)
+    ///     }
+    /// }
+    /// ```
     fn new_syllable(&self, is_stressed: bool) -> String {
         let mut new_syllable = String::new();
         let mut rand_gen = rand::thread_rng();
