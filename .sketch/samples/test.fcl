@@ -1,0 +1,12 @@
+group C {all consonants}
+group V {all vowels}
+
+filter ajust_syllable:
+	C%V -> { C%ʔV, %CV / C=W }
+
+filter mergin_back_vowel:
+	o -> {i e a} / {ŋ ɸ}_
+
+filter no_ew:
+	ew -> o
+	we -> wa

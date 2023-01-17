@@ -1,4 +1,4 @@
 from .setupcl import SetupCL
 from .wordgen import WordGenerator
-from . import formatter
+from . import phonex_reader
 from . import phevo

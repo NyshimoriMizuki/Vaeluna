@@ -1,10 +1,9 @@
 from core import SetupCL, WordGenerator
-from core.formatter import FormatterReader
-from core.phevo import PhevoReader
+from core.phevo import Phevo
+from core.phonex_reader import LabelNode, PhonexNode
 
 sample = SetupCL("samples/test")
 gen = WordGenerator(sample)
 
-formater = FormatterReader("samples/test.fmtcl")
-phevo = PhevoReader("samples/test_to_pex.phevo")
-print(list(phevo.tokenize()))
+phevo = Phevo("samples/test_to_pex.phevo")
+print(LabelNode("filter", "no_aj", [PhonexNode(["aj"], ["ej"], ["target"])]))

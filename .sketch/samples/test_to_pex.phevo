@@ -6,6 +6,6 @@ group V {all vowels}
 b d -> p t
 w -> gʷ -> g "comment"
 @"stop comment"
-change_vowels_æ:
+change vowels_æ:
  - e o -> i u /_#
  - a -> æ / _{k g} or {k g}_
