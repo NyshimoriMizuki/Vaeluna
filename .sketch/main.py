@@ -1,9 +1,9 @@
 from core import SetupCL, WordGenerator
-from core.phevo import Phevo
-from core.phonex_reader import LabelNode, PhonexNode
+from core.phonex import Phonex
 
-sample = SetupCL("samples/test")
-gen = WordGenerator(sample)
+setup = SetupCL("samples/test")
+gen = WordGenerator(setup)
 
-phevo = Phevo("samples/test_to_pex.phevo")
-print(LabelNode("filter", "no_aj", [PhonexNode(["aj"], ["ej"], ["target"])]))
+engine = Phonex(".\\samples\\test-formater.phex")
+engine.run()
+print(engine.vars)

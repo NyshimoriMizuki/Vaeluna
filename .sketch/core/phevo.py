@@ -2,7 +2,7 @@ from typing import List
 import re
 
 
-from .phonex_reader import PhonexReader, Token
+from .phonex_reader import PhonexReader, Node
 
 
 class Phevo(PhonexReader):

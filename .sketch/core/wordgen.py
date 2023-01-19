@@ -2,7 +2,6 @@ from random import choice, randrange
 from typing import List
 
 from .setupcl import SetupCL
-from .phonex_reader import PhonexReader
 
 
 class WordGenerator:
@@ -39,11 +38,3 @@ class WordGenerator:
         import re
         optional = re.compile(r"\(?\w\)?")
         return re.findall(optional, target)
-
-
-class Formatter(PhonexReader):
-    def __init__(self, filename: str):
-        super().__init__(filename)
-
-    def format(self):
-        pass
