@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import re
+from typing import Dict
 
 
 WHITESPACE = {
@@ -17,12 +18,36 @@ BLOCKS = {
 }
 
 
+class Filter:
+    def __init__(self, filter_node: 'LabelNode') -> None:
+        self.phonexs = [Phonex.build_phonex(i) for i in filter_node.content]
+
+    def __repr__(self) -> str:
+        return f"Filter: {self.phonexs}"
+
+    def run(self, target):
+        for line in self.phonexs:
+            for case, to in line:
+                target = self.applier(
+                    (case, to if not to in "0*∅" else ""), target)
+        return target
+
+    @staticmethod
+    def applier(x, z):
+        return re.sub(x[0], x[1], z)
+    # [[<function >, <function >], [<function >, <function >]]
+
+
 class Phonex:
     def __init__(self, filename: str):
         self.ast = PhonexReader(filename).tokenize().get_parsed_text()
         self.vars = dict()
+        self.funcs: Dict[str, Filter] = dict()
 
-    def run(self):
+    def run(self, targets: list):
+        pass
+
+    def preprocess(self):
         for node in self.ast:
             if type(node) == GroupNode:
                 self.vars.update({
@@ -30,14 +55,42 @@ class Phonex:
                                  if (extend_group := self.__get_extend_group(node.value[-1]))
                                  else node.value[0])
                 })
+            elif type(node) == LabelNode and node.type == 'filter':
+                self.funcs.update({node.name: Filter(node)})
             else:
                 print(f"Unknown node: <{node}>")
 
-    def apply_phonex(self, targets):
-        pass
+    @staticmethod
+    def build_phonex(phonex_node: 'PhonexNode'):
+        # PhonemeExpression { condition: _, left: [['we']], right: [['wa']] }
+        # .use(target)
+        # // return re.replace(r'(we', 'wa', target):
+        # //
+        phonexs = []
+        for group_l, group_r in zip(phonex_node.left, phonex_node.right):
+            for i, v in enumerate(group_l):
+                condition, around = parse_condition(
+                    phonex_node.condition, target=v)
+                subtitute_to = ''
 
-    def build_filter(self):
-        pass
+                if len(group_l) >= len(group_r):
+                    subtitute_to = index_in(i, group_r)
+
+                    if around['before']:
+                        subtitute_to = around['before']+subtitute_to
+                    if around['after']:
+                        subtitute_to += around['after']
+                else:
+                    for i in subtitute_to:
+                        if around['before']:
+                            subtitute_to[i] = around['before']+subtitute_to[i]
+                        if around['after']:
+                            subtitute_to[i] += around['after']
+
+                phonexs.append(
+                    (condition, subtitute_to)
+                )
+        return phonexs
 
     def __get_extend_group(self, group_name):
         if group_name != "extends:None":
@@ -61,7 +114,7 @@ class PhonexReader:
         group = re.compile(
             r'(group|define|def)\s*(?P<name>[A-Z])\s*{\s*(?P<extend>[A-Z]\+|\+[A-Z])?\s*(?P<value>.+)\s*}')
         stopcomment = re.compile(r'@"(?P<message>.*)"')
-        label = re.compile(r"^(?P<type>filter|change)? ?(?P<name>.+):$")
+        label = re.compile(r"^(?P<type>filter|rominize)? ?(?P<name>.+):$")
         phonex = re.compile(
             r'^(?P<indent> - |—)?(?P<left>{.+}|.+) +(->|>|→) +(?P<right>{.+}|[^\n\/]+) *(?P<case>\/.+$|$)')
 
@@ -98,6 +151,29 @@ class PhonexReader:
                 self.parsed_text.append(new_match)
         return self
 
+
+def parse_condition(condition: str, target: str) -> re.Pattern:
+    condition = condition.replace("/ ", "").replace("/", "")
+
+    score_index = condition.index("_")
+    wb = condition.replace("#", "^") if "#_" in condition else condition
+    wb = wb.replace("#", "$") if "_#" in condition else wb
+
+    condition = condition.replace("#", "")
+    return (wb.replace("_", target), {
+            "before": condition[:score_index] if 0 < score_index else None,
+            "after": condition[score_index+1:] if score_index+1 < len(condition) else None
+            }
+            )
+
+
+def index_in(i: int, list_: list):
+    if len(list_) < 1:
+        raise Exception(f"Empty list {list_}")
+
+    if i > len(list_):
+        return list_[-1]
+    return list_[i]
 
 def break_to_list(target):
     m = []
@@ -169,3 +245,8 @@ class LabelNode(Node):
 
     def add_content(self, content):
         self.content.append(content)
+
+
+# filter ajust_syllable:
+#  - C%V -> C%ʔV
+#  - C%ʔV -> {C%ʔV, %CV} / C=W
