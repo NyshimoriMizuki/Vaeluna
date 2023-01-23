@@ -35,12 +35,14 @@ class Filter:
     @staticmethod
     def applier(x, z):
         return re.sub(x[0], x[1], z)
-    # [[<function >, <function >], [<function >, <function >]]
 
 
 class Phonex:
     def __init__(self, filename: str):
-        self.ast = PhonexReader(filename).tokenize().get_parsed_text()
+        with open(filename, "r", encoding="utf8") as f:
+            self.file_content = f.read()
+
+        self.ast = self.build_ast()
         self.vars = dict()
         self.funcs: Dict[str, Filter] = dict()
 
@@ -58,14 +60,11 @@ class Phonex:
             elif type(node) == LabelNode and node.type == 'filter':
                 self.funcs.update({node.name: Filter(node)})
             else:
-                print(f"Unknown node: <{node}>")
+                # print(f"Unknown node: <{node}>")
+                pass
 
     @staticmethod
     def build_phonex(phonex_node: 'PhonexNode'):
-        # PhonemeExpression { condition: _, left: [['we']], right: [['wa']] }
-        # .use(target)
-        # // return re.replace(r'(we', 'wa', target):
-        # //
         phonexs = []
         for group_l, group_r in zip(phonex_node.left, phonex_node.right):
             for i, v in enumerate(group_l):
@@ -97,26 +96,16 @@ class Phonex:
             if not group_name[-1] in self.vars.keys():
                 raise Exception(f"no group called <{group_name[-1]}>")
             return self.vars[group_name[-1]]
-
-
-class PhonexReader:
-    def __init__(self, filename: str):
-        with open(filename, "r", encoding="utf8") as f:
-            self.file_content = f.read()
-        self.parsed_text = []
-
-    def get_parsed_text(self):
-        if self.parsed_text:
-            return self.parsed_text
-        raise Exception("PhonexReader is not tokenized")
-
-    def tokenize(self):
+    
+    def build_ast(self):
         group = re.compile(
             r'(group|define|def)\s*(?P<name>[A-Z])\s*{\s*(?P<extend>[A-Z]\+|\+[A-Z])?\s*(?P<value>.+)\s*}')
         stopcomment = re.compile(r'@"(?P<message>.*)"')
         label = re.compile(r"^(?P<type>filter|rominize)? ?(?P<name>.+):$")
         phonex = re.compile(
             r'^(?P<indent> - |—)?(?P<left>{.+}|.+) +(->|>|→) +(?P<right>{.+}|[^\n\/]+) *(?P<case>\/.+$|$)')
+
+        parsed_text = []
 
         for line in self.file_content.split("\n"):
             new_match = None
@@ -140,16 +129,17 @@ class PhonexReader:
                     match["case"] if match["case"] else "_"
                 )
 
-                if match["indent"] and len(self.parsed_text) > 0 and type(self.parsed_text[-1]) == LabelNode:
-                    self.parsed_text[-1].add_content(phonex_node)
+                if match["indent"] and len(parsed_text) > 0 and type(parsed_text[-1]) == LabelNode:
+                    parsed_text[-1].add_content(phonex_node)
                     continue
                 new_match = phonex_node
             else:
                 new_match = UnknownNode(line)
 
             if line:
-                self.parsed_text.append(new_match)
-        return self
+                parsed_text.append(new_match)
+    
+        return parsed_text
 
 
 def parse_condition(condition: str, target: str) -> re.Pattern:
@@ -174,6 +164,7 @@ def index_in(i: int, list_: list):
     if i > len(list_):
         return list_[-1]
     return list_[i]
+
 
 def break_to_list(target):
     m = []

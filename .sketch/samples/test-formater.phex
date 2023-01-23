@@ -1,5 +1,10 @@
-filter teste:
- - ʎ kw -> l gʷ
- - ə́ ə -> a e
- - gʷ -> g
- - u -> 0 / _#
+group C { all-consonants }
+group V { +C, all-vowels }
+
+
+filter mergin_back_vowel:
+ - o -> { i, e, a } / { ŋ, ɸ }_
+
+filter no_ew:
+ - ew we -> o wa / _k
+ - eu ue -> o wa

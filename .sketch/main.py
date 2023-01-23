@@ -6,13 +6,13 @@ from core.phonex import Phonex
 setup = SetupCL("samples/test")
 gen = WordGenerator(setup)
 
-targget = argv[1]
+# targget = argv[1]
 
-engine = Phonex(".\\samples\\test-formater.phex")
-engine.preprocess()
-# print(engine.vars)
-print(engine.funcs['teste'].run(targget))
-
+# engine = Phonex(".\\samples\\test-formater.phex")
+engine = Phonex("""
+a e -> o i
+""")
+engine.build_ast()
 
 """
 group C { all-consonants }
