@@ -1,16 +1,16 @@
-group C {all-consonants}
-group V {all-vowels}
-group F {j w ɽ}
+Group C {All-Consonants}
+Group V {All-Vowels}
+Group F {j w ɽ}
 
 
-filter mergin_back_vowel:
+Filter MerginBackVowel:
  - o -> { i, e, a } / { ŋ, ɸ }_
 
-filter no_ew:
+Filter No_ew:
  - ew we -> o wa / _k
  - eu ue -> o wa
 
-filter no_ji:
+Filter No_ji:
  - {jiF, j%iF} -> ʔiF
  - {ji, j%i} -> j
  - {jj, j%j} -> %j
