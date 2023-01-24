@@ -4,5 +4,5 @@ from core import SetupCL
 
 setup = SetupCL("samples/test")
 
-lexer = phre.PhonexLexer("a > e", setup)
-print(lexer.phonemes)
+lexer = phre.PhonexLexer("Group C {}\na -> ʔ", setup)
+print(lexer.src, lexer.tokenize(), sep="\n\n")
