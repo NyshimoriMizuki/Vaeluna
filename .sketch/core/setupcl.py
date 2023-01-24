@@ -8,12 +8,23 @@ class SetupCL:
         self.word_length = 0
         self.phonemes: Dict[str, List[str]] = dict()
         self.read_json(
-            scl_file if "test.scl.json" in scl_file else scl_file+".scl.json")
+            scl_file if ".scl.json" in scl_file else scl_file+".scl.json")
 
     def is_inicilized(self):
         if self.syllable_struct and self.word_length and self.phonemes:
             return True
         return False
+
+    def add_phoneme(self, group: str, phoneme: str):
+        if not group in self.phonemes.keys():
+            raise Exception(f"Group <{group}> does not exist")
+        self.phonemes[group].append(phoneme)
+
+    def add_phonemes(self, group: str, phonemes: list[str]):
+        if not group in self.phonemes.keys():
+            raise Exception(f"Group <{group}> does not exist")
+        for phoneme in phonemes:
+            self.phonemes[group].append(phoneme)
 
     def read_json(self, file: str):
         with open(file, "r", encoding="utf8") as f:

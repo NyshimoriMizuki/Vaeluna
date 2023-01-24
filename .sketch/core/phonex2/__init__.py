@@ -1,4 +1,4 @@
-from .phonex_reader import PhonexReader
+from .phonex_reader import PhonexReader, PhonexLexer, PhonexParser, Token
 
 
 class Phonex:
