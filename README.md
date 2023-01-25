@@ -1,2 +1,10 @@
-# Vaeluna
-A program for conlanger to generate words, change the phonology in time and manage the conlang
+<div align="center">
+    <img src=".\icon\logo.png" height=120>
+</div>
+
+------------------------
+
+## Introduction
+Vaeluna is a program for conlanger to manage and make easier the conlang.
+
+I was dissatisfied with the how slow was to make a conlang, word generators that I saw as too simple and "weird" sound changes applier. So, I decided to make my own vesion of this things in one program, a conlang manager.
