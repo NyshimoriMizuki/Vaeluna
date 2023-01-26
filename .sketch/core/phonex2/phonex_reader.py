@@ -11,6 +11,7 @@ WHITESPACE_AND_BRACKETS = {
     "{": "OPEN_SET",
     "}": "CLOSE_SET"
 }
+DIACRITICS = "̹̜̟̠̺̻̝˔̞˕ː̄˞̩̬ᶲᵝʰʲʷ̯̥̆̃ⁿ̤ʱˤˠᵐᶬᶯᶮᵑᶰʼ̊"
 
 
 class PhonexReader:
@@ -19,11 +20,10 @@ class PhonexReader:
 
 
 class PhonexLexer:
-    def __init__(self, sourcecode: str, setup: SetupCL) -> None:
+    def __init__(self, sourcecode: str) -> None:
         self.src = sourcecode
         self.position = -1
         self.last_token = Token("EOF")
-        self.phonemes = join_lists(setup.phonemes.values())
         self.tokenized: list['Token'] = []
         self.in_expr = False
         self.open_comment = False
@@ -36,14 +36,15 @@ class PhonexLexer:
     def tokenize(self) -> list['Token']:
         while self.position < len(self.src):
             if new_token := self.next_token():
+                self.last_token = new_token
                 self.tokenized.append(new_token)
         return self.tokenized
 
     def next_token(self) -> Optional['Token']:
         char = self.next()
 
-        if (self.last_token == Token("IDENT") and not char in '>{}→ \n\t') or \
-                (self.open_comment and char != '"'):
+        if (self.open_comment and char != '"') or \
+                (char in DIACRITICS and self.last_token == Token("PHONE")):
             self.tokenized[-1].add_value(char)
             return
 
@@ -56,7 +57,7 @@ class PhonexLexer:
         elif self.nexts_equal_to("->"):
             char = '→'
 
-        return self.__assign_and_return(
+        return (
             Token("blank")
             .if_blank(char == EOF, Token("EOF"))
             .elif_blank(char == '"',
@@ -70,25 +71,8 @@ class PhonexLexer:
             .elif_blank(self.nexts_equal_to("filter"), Token("KEY", "filter"))
             .elif_blank(self.nexts_equal_to("group"), Token("KEY", "group"))
             .elif_blank(char.isupper(), Token("IDENT", char))
-            .elif_blank(self.__char_is_in_phonemes_or_coarticulation(char),
-                        Token("PHONE", self.__find_phoneme()))
             .else_blank(Token("PHONE", char))
         )
-
-    def __find_phoneme(self) -> Optional[str]:
-        for phoneme in sorted(self.phonemes, key=len, reverse=True):
-            if self.nexts_equal_to(phoneme):
-                return phoneme
-
-    def __assign_and_return(self, token: 'Token') -> 'Token':
-        self.last_token = token
-        return token
-
-    def __char_is_in_phonemes_or_coarticulation(self, char: str) -> bool:
-        for i in self.phonemes:
-            if char in i:
-                return True
-        return False
 
     def next(self) -> str:
         self.position += 1
@@ -107,8 +91,8 @@ class PhonexLexer:
 
 
 class PhonexParser:
-    def __init__(self) -> None:
-        pass
+    def __init__(self, setup: SetupCL, tokens: list['Token']) -> None:
+        self.phonemes = join_lists(setup.phonemes.values())
 
 
 class Token:
