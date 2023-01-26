@@ -12,7 +12,6 @@ h→ʔ/!#_ or !_#
 ps ks> s ts
 aj -> ē
 tVɽ -> t̠ɹ̠̊˔V
-kʟ̝̊ʼ
 ''')
 print(lexer.tokenize())
 
