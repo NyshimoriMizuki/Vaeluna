@@ -60,26 +60,36 @@ class PhonexLexer:
         elif self.nexts_equal_to(" - "):
             char = '—'
 
+        is_keyword = self.is_current_a_keyword([
+            "filter",
+            "group",
+            "all",
+            "consonants",
+            "vowels"
+        ])
+
         return (
             Token("blank")
             .if_blank(char == EOF, Token("EOF"))
             .elif_blank(char == '"',
                         Token("COMMENT" if self.open_comment else "END_COMMENT"))
             .elif_blank(char == "/", Token("EXPR"))
-            .elif_blank(char == "—", Token("IN_LABEL"))
+            .elif_blank(char in "—", Token("IN_LABEL"))
             .elif_blank(char in ">→", Token("OPER", "TO"))
             .elif_blank((self.nexts_equal_to("or")) and self.in_expr,
                         Token("OPER", "OR"))
             .elif_blank(char in "!#_%@:", Token("OPER", char))
             .elif_blank(char in " \t\n{}", Token(WHITESPACE_AND_BRACKETS.get(char)))
-            .elif_blank(self.nexts_equal_to("filter"), Token("KEY", "filter"))
-            .elif_blank(self.nexts_equal_to("group"), Token("KEY", "group"))
-            .elif_blank(self.nexts_equal_to("all"), Token("KEY", "all"))
-            .elif_blank(self.nexts_equal_to("consonants"), Token("KEY", "consonants"))
-            .elif_blank(self.nexts_equal_to("vowels"), Token("KEY", "vowels"))
+            .elif_blank(is_keyword[0], Token("KEY", is_keyword[1]))
             .elif_blank(char.isupper(), Token("IDENT", char))
             .else_blank(Token("PHONE", char))
         )
+
+    def is_current_a_keyword(self, keys: list[str]):
+        for key in keys:
+            if self.nexts_equal_to(key):
+                return (True, key)
+        return (False, "")
 
     def next(self) -> str:
         self.position += 1
