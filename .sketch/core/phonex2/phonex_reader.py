@@ -1,6 +1,7 @@
-from typing import Optional
+from typing import Optional, Union
 
 from ..setupcl import SetupCL
+from .nodes import *
 
 
 EOF = "\0"
@@ -56,6 +57,8 @@ class PhonexLexer:
             self.open_comment = not self.open_comment
         elif self.nexts_equal_to("->"):
             char = '→'
+        elif self.nexts_equal_to(" - "):
+            char = '—'
 
         return (
             Token("blank")
@@ -63,13 +66,17 @@ class PhonexLexer:
             .elif_blank(char == '"',
                         Token("COMMENT" if self.open_comment else "END_COMMENT"))
             .elif_blank(char == "/", Token("EXPR"))
+            .elif_blank(char == "—", Token("IN_LABEL"))
             .elif_blank(char in ">→", Token("OPER", "TO"))
             .elif_blank((self.nexts_equal_to("or")) and self.in_expr,
                         Token("OPER", "OR"))
-            .elif_blank(char in "!#_%@", Token("OPER", char))
+            .elif_blank(char in "!#_%@:", Token("OPER", char))
             .elif_blank(char in " \t\n{}", Token(WHITESPACE_AND_BRACKETS.get(char)))
             .elif_blank(self.nexts_equal_to("filter"), Token("KEY", "filter"))
             .elif_blank(self.nexts_equal_to("group"), Token("KEY", "group"))
+            .elif_blank(self.nexts_equal_to("all"), Token("KEY", "all"))
+            .elif_blank(self.nexts_equal_to("consonants"), Token("KEY", "consonants"))
+            .elif_blank(self.nexts_equal_to("vowels"), Token("KEY", "vowels"))
             .elif_blank(char.isupper(), Token("IDENT", char))
             .else_blank(Token("PHONE", char))
         )
@@ -93,6 +100,30 @@ class PhonexLexer:
 class PhonexParser:
     def __init__(self, setup: SetupCL, tokens: list['Token']) -> None:
         self.phonemes = join_lists(setup.phonemes.values())
+        self.tokens = tokens
+        self.ast = []
+
+    def parse(self):
+        pass
+
+    def agglutinate(self):
+        list_res = []
+        last_token = Token("blank")
+        for current_token in self.tokens:
+            current_token = Token("WHITESPACE") if current_token.is_("TAB") or \
+                current_token.is_("SPACE") else current_token
+
+            if self.compare(last_token, current_token,  # and they in
+                            [Token("PHONE"), Token("WHITESPACE"), Token("NEW_LINE")]):
+                last_token.join(current_token)
+                continue
+            last_token = current_token
+            list_res.append(last_token)
+        self.tokens = list_res
+
+    @staticmethod
+    def compare(_1: 'Token', _2: 'Token', agglutinate_tokens_list: list['Token']):
+        return _1 in agglutinate_tokens_list and _2 == _1
 
 
 class Token:
@@ -111,6 +142,10 @@ class Token:
     def add_value(self, value):
         self.value = (self.value if self.value else "") + value
 
+    def join(self, token: 'Token'):
+        if self.value and token.value:
+            self.value += token.value
+
     def if_blank(self, condition: bool, token: 'Token'):
         if self.type == "blank".upper() and condition:
             self.type, self.value = token.type, token.value
@@ -121,6 +156,11 @@ class Token:
 
     def else_blank(self, token: 'Token'):
         return self.if_blank(True, token)
+
+    def is_(self, token: Union['Token', str]):
+        if type(token) == str:
+            return self.type == token
+        return token == self
 
 
 def join_lists(lists):
