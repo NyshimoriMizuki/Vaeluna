@@ -1,9 +1,0 @@
-{
-    "syllable_struct": "(C)V(F)",
-    "word_length": 3,
-    "phonemes": {
-        "C": ["b", "d", "k", "ps", "ts", "ks", "ʔ", "m", "n", "ŋ", "ɸ", "s", "h", "w", "j"],
-        "V": ["i", "e", "o", "a"],
-        "F": ["w", "j", "ɽ"]
-    }
-}
