@@ -6,12 +6,11 @@
 //! ### Exemple:
 //! ```
 //! {
-//!    "syllable_struct": "(C)V(F)",
+//!    "syllable_struct": "(C)V(C)",
 //!    "word_length": 3,
 //!    "phonemes": {
 //!        "C": ["m", "n", "p", "t", "k", "s", "h", "l", "w", "j"],
-//!        "V": ["a", "e", "i", "o", "u"],
-//!        "F": ["m", "n", "l", "w", "j"]
+//!        "V": ["a", "e", "i", "o", "u"]
 //!    },
 //!    "extra_params": {
 //!        "no_stops_encounter": true
@@ -45,7 +44,7 @@
 //! > ...
 //! > ```
 //! >
-//! > Some groups coul be marked as `Optional` with the paranteses, what don't have it is mandatory.
+//! > Some groups could be marked as `Optional` with the paranteses, what don't have it is mandatory.
 //! >
 //! > ```
 //! > "syllable_struct": "CV(C)",
@@ -53,12 +52,32 @@
 //! >  ```
 //!
 //! * ### `word_length`
-//! > It tell
+//! > It tells who long can a word be in this conlang.
+//! >
+//! > In this case, the maximun word length is 3, with maximun of 3 syllables in one word.
+//! > ```
+//! > "word_length": 3,
+//! > ...
+//! >  ```
 //!
 //! * ### `phonemes`
+//! > This sets the groups used in `syllable_struct`, linsting the phonemes in each group.
+//! >
+//! > ```
+//! > "phonemes": {
+//! >     "C": ["m", "n", "p", "t", "k", "s", "h", "l", "w", "j"],
+//! >     "V": ["a", "e", "i", "o", "u"],
+//! >     "F": ["m", "n", "l", "w", "j"],
+//! > }
+//! >  ```
 //!
 //! ## Extra parameters
+//! > There is som extra parameters to a best word generation (this is being inplemented)
 //!
+//! > Somo of thes parameters are:
+//! > * no_stops_encounter
+//! > * is_tonal_lang
+//! > * generate_roots
 
 use serde::{Deserialize, Serialize};
 use serde_json::{self, Error};
@@ -66,6 +85,18 @@ use std::collections::HashMap;
 use std::fs::read_to_string;
 
 /// # SetupCL
+///
+/// > This is a struct that builds all settings for a Vaeluna project, includes informations
+/// > of how build a word, what phonemes it will use. <br>
+/// > It also includes some optional extra parameter, like `is_tonal_lang` for when will use
+/// > tones instead of a stress system.
+///
+/// # Example
+/// ```
+/// ...
+///
+/// let setup = Setup::from_json("MyConlang.scl.json").expect("File don't existe");
+/// ```
 #[derive(Deserialize, Serialize, Debug)]
 pub struct SetupCL {
     syllable_struct: String,
@@ -75,10 +106,12 @@ pub struct SetupCL {
 }
 
 impl SetupCL {
-    /// returns the phonemes from the SetupCL
+    /// returns the phonemes from a SetupCL
     ///
     /// # Example
     /// ```
+    /// ...
+    ///
     /// let setup = Setup::from_json("...").expect("File don't existe");
     /// let phonemes = setup.get_phonemes();
     /// ```
@@ -86,10 +119,12 @@ impl SetupCL {
         copy(&self.phonemes)
     }
 
-    /// returns the word_length from the SetupCL
+    /// returns the word_length from a SetupCL
     ///
     /// # Example
     /// ```
+    /// ...
+    ///
     /// let setup = Setup::from_json("...").expect("File don't existe");
     /// let phonemes = setup.get_word_length();
     /// ```
@@ -97,10 +132,12 @@ impl SetupCL {
         &self.word_length
     }
 
-    /// returns the syllable_struct from the SetupCL
+    /// returns the syllable_struct from a SetupCL
     ///
     /// # Example
     /// ```
+    /// ...
+    ///
     /// let setup = Setup::from_json("...").expect("File don't existe");
     /// let phonemes = setup.get_syllable_struct();
     /// ```
@@ -108,11 +145,16 @@ impl SetupCL {
         &self.syllable_struct[..]
     }
 
+    /// Builds a new SetupCL with a json file
+    ///
     /// # Errors
-    /// what causes the error
+    /// Raise an error when could not read the json file
+    ///
     /// # Example
     /// basic usege:
     /// ```
+    /// ...
+    ///
     /// let setup = SetupCL::from_json("MyConlang.scl.json")
     ///
     /// match setup {
@@ -131,6 +173,7 @@ impl SetupCL {
     }
 }
 
+/// Function used to clone a `HashMap`
 fn copy<K: Clone, V: Clone>(map: &HashMap<K, V>) -> HashMap<K, V> {
     map.clone()
 }

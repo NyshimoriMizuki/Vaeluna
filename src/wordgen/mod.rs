@@ -1,5 +1,8 @@
 //! # WordGenerator
 //!
+//! WordGenerator is a Vaeluna module that creates new words to the conlang.
+//! It includes`WordGenerator` and `Formatter`, which is used to format the
+//! generated word by the `WordGenerator`.
 
 use rand::seq::SliceRandom;
 use rand::Rng;
@@ -9,6 +12,9 @@ mod formatter;
 
 use crate::setupcl::SetupCL;
 
+/// # WordGenerator
+///
+/// This structs builds a Word generator for Vaeluna
 #[derive(Debug)]
 pub struct WordGenerator<'a> {
     phonemes: HashMap<String, Vec<String>>,
@@ -22,8 +28,10 @@ impl WordGenerator<'_> {
     ///
     /// ## Example
     /// ```
-    /// let setup = SetupCL::from_json("...").expect("...");
+    /// ...
+    ///
     /// let generator = WordGenerator::new(setup);
+    /// let setup = SetupCL::from_json("...").expect("...");
     /// ```
     pub fn new<'a>(setup: &'a SetupCL) -> WordGenerator<'a> {
         WordGenerator {
@@ -36,6 +44,18 @@ impl WordGenerator<'_> {
     /// This Function creates a [`Vec<String>`] that contains new words
     ///
     /// `num` tells how many words will be generated
+    ///
+    /// # Example
+    /// ```
+    /// ...
+    ///
+    /// let setup = SetupCL::from_json("...").expect("File don't exist");
+    /// let wordgen = WordGenerator::new(&setup);
+    ///
+    /// for word in wordgen.generate(10) {
+    ///     println!("{}", word);
+    /// }
+    /// ```
     pub fn generate(self, num: Option<u32>) -> Vec<String> {
         let mut words: Vec<String> = Vec::new();
         let mut rng = rand::thread_rng();
@@ -48,16 +68,18 @@ impl WordGenerator<'_> {
             for i in 0..number_of_syllables {
                 new_word.push(self.new_syllable(i == stress_position));
             }
-            words.push(new_word.join("·"));
+            words.push(new_word.join(""));
         }
 
         words
     }
 
-    /// Build a new syllable, that could be a stressed syllable
+    /// Build a new syllable, that could be or not a stressed syllable
     ///
     /// # Example
     /// ```
+    /// ...
+    ///
     /// impl WordGenerator<'_> {
     ///     pub fn new_monosyllabic_word(self, stress: bool) -> String {
     ///         self.new_syllable(stress)
@@ -70,8 +92,9 @@ impl WordGenerator<'_> {
 
         for i in &self.syllable_struct {
             let optional_phoneme = i.contains("(");
+            let is_to_jump = rand_gen.gen::<bool>();
 
-            if optional_phoneme && rand_gen.gen::<bool>() {
+            if optional_phoneme && is_to_jump {
                 continue;
             }
             new_syllable.push_str(
@@ -86,6 +109,19 @@ impl WordGenerator<'_> {
     }
 }
 
+/// This funtion breaks the `SetupCl.syllable_struct` in to a `Vec<&str>`
+/// with
+///
+/// # Example
+/// ```
+/// ...
+///
+/// let target_str = "(C)VT(N)";
+/// let broken_str = break_into_vec(target_str);
+///
+/// println!("Broken string is '{}'", broken_str);
+/// // Broken string is ["(C)", "V", "T", "(N)"]
+/// ```
 fn break_into_vec(target: &str) -> Vec<&str> {
     use regex::Regex;
     Regex::new(r"\(?[A-Z]\)?")

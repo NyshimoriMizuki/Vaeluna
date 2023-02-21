@@ -5,8 +5,5 @@ pub struct Phonex {
 }
 
 impl Phonex {
-    pub fn build(filename: &str) {
-        let text = reader::Reader::from(filename);
-        text.tokenize();
-    }
+    pub fn build(filename: &str) {}
 }

@@ -1,13 +1,13 @@
-mod phonex;
-mod setupcl;
-mod wordgen;
+pub mod phonex;
+pub mod setupcl;
+pub mod wordgen;
 
 use setupcl::SetupCL;
 use wordgen::WordGenerator;
 
 fn main() {
-    let setup = SetupCL::from_json("samples/test.scl.json").expect("File don't existe");
-    let test = WordGenerator::new(&setup);
+    let setup = SetupCL::from_json("samples/test.scl.json").expect("File don't exists");
+    let generator = WordGenerator::new(&setup);
 
-    phonex::Phonex::build("samples/test-formater.phex");
+    println!("{:#?}", generator.generate(Some(5)));
 }
